@@ -8,12 +8,6 @@
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 		<link rel="stylesheet" href="styles.css">
-
-		<meta name="description" content="Wynnver — quick reference for recommended and supported Wynncraft versions.">
-		<meta property="og:title" content="Wynnver — Wynncraft Version Guide">
-		<meta name="twitter:title" content="Wynnver — Wynncraft Version Guide">
-		<meta property="og:description" content="Wynnver — quick reference for recommended and supported Wynncraft versions.">
-		<meta name="twitter:description" content="Wynnver — quick reference for recommended and supported Wynncraft versions.">
 	</head>
 	<body>
 		<main>
@@ -59,46 +53,5 @@
 			document.documentElement.style.setProperty('--hero-bg', `url(${BG_URL})`);
 		</script>
 		<script src="script.js"></script>
-
-		<script>
-			(function () {
-				function getText(key) {
-					return document.querySelector('[data-key="' + key + '"]')?.textContent?.trim() || '';
-				}
-				function setMeta(selector, content) {
-					const el = document.querySelector(selector);
-					if (el) el.setAttribute('content', content);
-				}
-				function tryUpdate() {
-					const community = getText('community');
-					const server = getText('serverRecommended');
-					const lowest = getText('lowest');
-					const highest = getText('highest');
-
-					if (!community || community === 'TBD' || !server || server === 'TBD' || !lowest || lowest === 'TBD' || !highest || highest === 'TBD') {
-						return false;
-					}
-
-					const title = `You should join Wynn on version: ${community}`;
-					const description = `Wynn recommends ${server}, although it supports clients from between versions ${lowest} and ${highest}`;
-
-					document.title = title;
-					setMeta('meta[name="description"]', description);
-					setMeta('meta[property="og:title"]', title);
-					setMeta('meta[name="twitter:title"]', title);
-					setMeta('meta[property="og:description"]', description);
-					setMeta('meta[name="twitter:description"]', description);
-					return true;
-				}
-
-				let attempts = 0;
-				const interval = setInterval(function () {
-					attempts += 1;
-					if (tryUpdate() || attempts > 25) {
-						clearInterval(interval);
-					}
-				}, 200);
-			})();
-		</script>
 	</body>
 </html>

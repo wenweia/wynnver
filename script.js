@@ -84,6 +84,16 @@
     }
 
     populate();
+
+    // Update Open Graph meta tags dynamically
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogTitle) {
+      ogTitle.setAttribute('content', `You should use Minecraft version ${DEFAULTS.community} to connect to Wynncraft!`);
+    }
+    if (ogDesc) {
+      ogDesc.setAttribute('content', `Note that Wynncraft technically supports clients as old as ${DEFAULTS.lowest} and as new as ${DEFAULTS.highest}.`);
+    }
   }
 
   document.addEventListener('DOMContentLoaded', init);

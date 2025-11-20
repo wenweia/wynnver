@@ -1,0 +1,133 @@
+:root {
+  --bg: #0f1724;
+  --card: #0b1220;
+  --muted: #bccfd6;
+  --accent: #6ee7b7;
+  --glass: rgba(255,255,255,0.04);
+  --max-width: 980px;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+
+.body, body {
+  margin: 0;
+  background: linear-gradient(180deg, var(--bg), #071024);
+  color: #e6eef6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 1.25rem;
+}
+
+.hero {
+  background-image: var(--hero-bg);
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.hero-overlay {
+  background: linear-gradient(180deg, rgba(2,6,23,0.45), rgba(2,6,23,0.55));
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.hero-title {
+  text-align: center;
+  width: 100%;
+  font-size: 3rem;
+  margin: 0 0 .25rem;
+}
+
+.cards-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  gap: .75rem;
+  width: 100%;
+  max-width: 980px;
+}
+
+.card {
+  padding: .9rem;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.card h3 {
+  margin: .25rem 0;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: .9rem;
+}
+
+.hero-sub {
+  color: var(--muted);
+  margin-top: .25rem;
+  font-size: 1rem;
+  text-align: center;
+  width: 100%;
+  font-size: 1rem;
+}
+
+.card {
+  background: linear-gradient(180deg, rgba(6,10,18,0.75), rgba(6,10,18,0.70));
+  padding: 1.25rem;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.8);
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+}
+
+.version {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin: .5rem 0;
+  color: var(--accent);
+}
+
+@media (max-width:900px) {
+  .cards {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+    max-width: 760px;
+  }
+  .version {
+    font-size: 1.15rem;
+  }
+}
+
+@media (max-width:520px) {
+  .hero {
+    height: 100vh;
+  }
+  .hero-title {
+    font-size: 2rem;
+  }
+  .cards {
+    grid-template-columns: repeat(1, minmax(120px, 1fr));
+    max-width: 360px;
+    gap: .5rem;
+  }
+  .version {
+    font-size: 1rem;
+  }
+  .hero-content {
+    padding: .75rem;
+  }
+}
+
+html,body {
+  height: 100%;
+}

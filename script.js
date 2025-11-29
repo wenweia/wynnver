@@ -1,8 +1,6 @@
 (() => {
   const DEFAULTS = {
     community: 'Error',
-    serverRecommended: '1.21.8',
-    // Keep lowest static per requirements — don't attempt to fetch it
     lowest: '1.20.5',
     highest: 'Error'
   };
@@ -47,11 +45,6 @@
     }
   }
 
-  // The server-side proxy range is no longer fetched from mcsrvstat.
-  // Per requirements, `lowest` is static (DEFAULTS.lowest). We'll instead
-  // fetch the latest/highest Java version from mc-versions-api and populate
-  // DEFAULTS.highest with that value.
-
   async function fetchHighestFromMCVersionsAPI() {
     try {
       const res = await fetch('https://mc-versions-api.net/api/java');
@@ -59,7 +52,6 @@
       const data = await res.json();
 
       let versions = null;
-      // The API can return different shapes; handle array or object with fields
       if (Array.isArray(data)) versions = data;
       else if (Array.isArray(data.versions)) versions = data.versions;
       else if (Array.isArray(data.data)) versions = data.data;
@@ -85,8 +77,6 @@
       DEFAULTS.community = String(highest);
     }
 
-    // `lowest` remains the static value in DEFAULTS.lowest; fetch highest
-    // supported Java/Minecraft version from the mc-versions API instead.
     const mcHighest = await fetchHighestFromMCVersionsAPI();
     if (mcHighest) {
       DEFAULTS.highest = mcHighest;
@@ -94,7 +84,6 @@
 
     populate();
 
-    // Update Open Graph meta tags dynamically
     const ogTitle = document.querySelector('meta[property="og:title"]');
     const ogDesc = document.querySelector('meta[property="og:description"]');
     if (ogTitle) {

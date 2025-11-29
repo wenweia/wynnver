@@ -2,7 +2,8 @@
   const DEFAULTS = {
     community: 'Error',
     serverRecommended: '1.21.8',
-    lowest: 'Error',
+    // Keep lowest static per requirements — don't attempt to fetch it
+    lowest: '1.20.5',
     highest: 'Error'
   };
 
@@ -46,27 +47,34 @@
     }
   }
 
-  function extractVersionsFromProxy(vstr) {
-    if (!vstr || typeof vstr !== 'string') return null;
-    const m = vstr.match(/(?:WynnProxy\s*)?([^\s-]+)-([^\s+]+)/i);
-    if (!m) return null;
-    let low = m[1].trim();
-    let high = m[2].trim();
-    if (high.endsWith('+')) high = high.slice(0, -1);
-    return { lowest: low, highest: high };
-  }
+  // The server-side proxy range is no longer fetched from mcsrvstat.
+  // Per requirements, `lowest` is static (DEFAULTS.lowest). We'll instead
+  // fetch the latest/highest Java version from mc-versions-api and populate
+  // DEFAULTS.highest with that value.
 
-  async function fetchWynnProxyRange() {
+  async function fetchHighestFromMCVersionsAPI() {
     try {
-      const res = await fetch('https://api.mcsrvstat.us/3/wynncraft.com');
-      if (!res.ok) throw new Error('Network error ' + res.status);
+      const res = await fetch('https://mc-versions-api.net/api/java');
+      if (!res.ok) throw new Error('Network error');
       const data = await res.json();
-      const ver = data && data.version;
-      const parsed = extractVersionsFromProxy(ver);
-      if (!parsed) console.debug('Could not parse proxy version string:', ver);
-      return parsed;
+
+      let versions = null;
+      // The API can return different shapes; handle array or object with fields
+      if (Array.isArray(data)) versions = data;
+      else if (Array.isArray(data.versions)) versions = data.versions;
+      else if (Array.isArray(data.data)) versions = data.data;
+      else if (Array.isArray(data.result)) versions = data.result;
+
+      if (!versions || versions.length === 0) return null;
+
+      let highest = versions[0];
+      for (let i = 1; i < versions.length; i++) {
+        const v = versions[i];
+        if (compareVersions(v, highest) > 0) highest = v;
+      }
+      return highest;
     } catch (e) {
-      console.debug('fetchWynnProxyRange failed:', e && e.message);
+      console.debug('fetchHighestFromMCVersionsAPI failed:', e && e.message);
       return null;
     }
   }
@@ -77,10 +85,11 @@
       DEFAULTS.community = String(highest);
     }
 
-    const proxyRange = await fetchWynnProxyRange();
-    if (proxyRange) {
-      DEFAULTS.lowest = proxyRange.lowest;
-      DEFAULTS.highest = proxyRange.highest;
+    // `lowest` remains the static value in DEFAULTS.lowest; fetch highest
+    // supported Java/Minecraft version from the mc-versions API instead.
+    const mcHighest = await fetchHighestFromMCVersionsAPI();
+    if (mcHighest) {
+      DEFAULTS.highest = mcHighest;
     }
 
     populate();

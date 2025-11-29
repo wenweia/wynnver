@@ -3,6 +3,8 @@ const https = require('https');
 
 const INDEX_PATH = 'index.html';
 
+const DEFAULTS = { lowest: '1.20.5' };
+
 function fetchJson(url) {
   return new Promise((resolve, reject) => {
     const options = {
@@ -41,26 +43,34 @@ async function getVersions() {
     }
   } catch (e) {}
 
-  // Lowest and highest supported
-  let lowest = 'TBD', highest = 'TBD';
+  let lowest = DEFAULTS.lowest, highest = 'TBD';
   try {
-    const proxy = await fetchJson('https://api.mcsrvstat.us/3/wynncraft.com');
-    const ver = proxy && proxy.version;
-    console.log('Fetched proxy.version:', ver);
-    process.stdout.write('Fetched proxy.version: ' + ver + '\n');
-    if (!ver) {
-      console.log('Full proxy object:', JSON.stringify(proxy, null, 2));
-      process.stdout.write('Full proxy object: ' + JSON.stringify(proxy) + '\n');
-    }
-    if (ver) {
-      const m = ver.match(/(?:WynnProxy\s*)?([^\s-]+)-([^\s+]+)/i);
-      if (m) {
-        lowest = m[1].trim();
-        highest = m[2].replace(/\+$/, '').trim();
+    try {
+      const mcData = await fetchJson('https://mc-versions-api.net/api/java');
+      let versions = null;
+      if (Array.isArray(mcData)) versions = mcData;
+      else if (Array.isArray(mcData.versions)) versions = mcData.versions;
+      else if (Array.isArray(mcData.data)) versions = mcData.data;
+      else if (Array.isArray(mcData.result)) versions = mcData.result;
+
+      if (versions && versions.length > 0) {
+        versions = versions.slice();
+        versions.sort((a, b) => {
+          const pa = a.split('.').map(Number);
+          const pb = b.split('.').map(Number);
+          for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+            if ((pa[i] || 0) > (pb[i] || 0)) return 1;
+            if ((pa[i] || 0) < (pb[i] || 0)) return -1;
+          }
+          return 0;
+        });
+        highest = versions.pop();
       } else {
-        console.log('Regex did not match version string:', ver);
-        process.stdout.write('Regex did not match version string: ' + ver + '\n');
+        console.log('mc-versions API returned an unexpected value:', JSON.stringify(mcData));
       }
+    } catch (e) {
+      console.log('Error fetching mc-versions-api list:', e);
+      process.stdout.write('Error fetching mc-versions-api list: ' + e + '\n');
     }
   } catch (e) {
     console.log('Error fetching or parsing proxy.version:', e);
